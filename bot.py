@@ -1377,7 +1377,7 @@ def main():
 
     # 🔹 Render yoki boshqa servislar uchun port
     port = int(os.environ.get("PORT", "8080"))
-    application.run_polling(allowed_updates=Update.ALL_TYPES, port=port)
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
 # def main():

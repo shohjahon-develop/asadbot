@@ -28,36 +28,38 @@
 from flask import Flask
 import asyncio
 import os
+import threading
 from bot import main as bot_main # bot.py dagi main funksiyasini import qilamiz
 
 app = Flask(__name__)
 
 @app.route('/')
-async def home(): # Bu yerda async funksiya bo'lishi shart emas, lekin hozircha qolaversin
+def home(): # 'async' kalit so'zini olib tashladik
     return "🤖 AsadBot ishga tushdi va faol holatda!"
 
 @app.route('/health')
-async def health_check():
+def health_check(): # 'async' kalit so'zini olib tashladik
     # Render servisning ishlashini tekshirish uchun oddiy endpoint
     return "OK", 200
 
 def run_bot_in_thread():
     """Botni o'zining event loop'ida ishga tushiradi."""
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    bot_main() # bot.py dagi main funksiyasini chaqiramiz
+    try:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        bot_main() # bot.py dagi main funksiyasini chaqiramiz
+    except Exception as e:
+        print(f"Bot threadida xato: {e}") # Xatolarni loglash uchun
+        # print(traceback.format_exc()) # Agar to'liq traceback kerak bo'lsa
 
 if __name__ == "__main__":
     # Botni alohida thread'da ishga tushiramiz
-    import threading
     bot_thread = threading.Thread(target=run_bot_in_thread)
     bot_thread.start()
 
     # Flask web-serverni ishga tushiramiz (Render uchun zarur)
     # Render odatda PORT environment o'zgaruvchisini ishlatadi.
-    port = int(os.environ.get("PORT", 5000)) # Odatda Render 8080 yoki o'zi bergan portni kutadi.
-                                             # Sizning skrinshotingizda 10000 ishlatilgan, shunga moslab qo'yaylik.
-                                             # Ammo yaxshisi Renderning default PORT o'zgaruvchisini ishlating.
+    port = int(os.environ.get("PORT", 5000)) # Render odatda 8080 yoki o'zi bergan portni kutadi.
     app.run(host="0.0.0.0", port=port, debug=False)
 
 
