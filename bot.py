@@ -1423,4 +1423,4 @@ def main():
 if __name__ == '__main__':
     main()
 
-application = Application.builder().token(BOT_TOKEN).build()
+
