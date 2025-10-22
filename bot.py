@@ -216,9 +216,10 @@ async def show_admin_users_page(update: Update, context: ContextTypes.DEFAULT_TY
     
     keyboard = []
     for uid, user_info in page_users:
-        button_text = f"{user_info.get('full_name', 'Noma\"lum')} - {user_info.get('position', 'Noma\"lum')}"
+        full_name = user_info.get('full_name', "Noma'lum")
+        position = user_info.get('position', "Noma'lum")
+        button_text = f"{full_name} - {position}"
         keyboard.append([InlineKeyboardButton(button_text, callback_data=f"admin_user_{uid}")])
-
     nav_buttons = []
     if page > 0:
         nav_buttons.append(InlineKeyboardButton("⬅️ Orqaga", callback_data=f"admin_page_{page-1}"))
