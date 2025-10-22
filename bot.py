@@ -261,16 +261,21 @@ async def admin_user_callback(update: Update, context: ContextTypes.DEFAULT_TYPE
     
     users_data = load_users_data()
     user_info = users_data.get(user_id, {})
-    
-    timestamp = user_info.get('timestamp', 'Noma\'lum')
-    
-    message = f"📋 Tanlangan foydalanuvchi:\n\n"
-    message += f"👤 Ism: {user_info.get('full_name', 'Noma\'lum')}\n"
-    message += f"💼 Lavozim: {user_info.get('position', 'Noma\'lum')}\n"
-    message += f"📱 Telefon: {user_info.get('phone', 'Noma\'lum')}\n"
-    message += f"🆔 User ID: {user_id}\n"
-    message += f"📅 Ariza sanasi: {timestamp}\n\n"
-    message += f"💬 Xabar yozing:"
+
+    full_name = user_info.get('full_name', "Noma'lum")
+    position = user_info.get('position', "Noma'lum")
+    phone = user_info.get('phone', "Noma'lum")
+    timestamp = user_info.get('timestamp', "Noma'lum")
+
+    message = (
+        "📋 Tanlangan foydalanuvchi:\n\n"
+        f"👤 Ism: {full_name}\n"
+        f"💼 Lavozim: {position}\n"
+        f"📱 Telefon: {phone}\n"
+        f"🆔 User ID: {user_id}\n"
+        f"📅 Ariza sanasi: {timestamp}\n\n"
+        "💬 Xabar yozing:"
+    )
     
     await query.edit_message_text(message)
 
