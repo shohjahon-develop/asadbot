@@ -672,6 +672,18 @@ from config import BOT_TOKEN, POSITIONS, PROXY_URL, PROXY_USERNAME, PROXY_PASSWO
 from questions import QUESTIONS
 from excel_generator import create_excel_file
 import httpx
+from telegram.ext import Updater, CommandHandler
+from config import BOT_TOKEN
+
+def start(update, context):
+    update.message.reply_text("Salom! Bot ishlayapti ✅")
+
+def start_bot():
+    updater = Updater(BOT_TOKEN, use_context=True)
+    dp = updater.dispatcher
+    dp.add_handler(CommandHandler("start", start))
+    updater.start_polling()
+    updater.idle()
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
