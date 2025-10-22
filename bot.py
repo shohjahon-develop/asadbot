@@ -1332,27 +1332,35 @@ def main():
     """
     Botni ishga tushirish
     """
-    builder = Application.builder().token(BOT_TOKEN)
+    from telegram.request import HTTPXRequest  # yangi versiya uchun import
 
+    # 🔹 Asosiy sozlash
+    request = HTTPXRequest(http_version="1.1")
+
+    # 🔹 Agar proxy ishlatilayotgan bo‘lsa
     if PROXY_URL:
         logger.info(f"Proxy ishlatilmoqda: {PROXY_URL}")
-
         proxy_auth = None
+
         if PROXY_USERNAME and PROXY_PASSWORD:
             proxy_auth = httpx.BasicAuth(PROXY_USERNAME, PROXY_PASSWORD)
 
-        httpx_client = httpx.AsyncClient(
+        # HTTPXRequest orqali proxy ulanadi
+        request = HTTPXRequest(
+            http_version="1.1",
             proxy=PROXY_URL,
-            auth=proxy_auth,
-            timeout=30.0
+            proxy_auth=proxy_auth
         )
 
-        from telegram.request import HTTPXRequest
-        request = HTTPXRequest(http_version="1.1", client=httpx_client)
-        builder = builder.request(request)
+    # 🔹 Builder yaratish
+    application = (
+        Application.builder()
+        .token(BOT_TOKEN)
+        .request(request)
+        .build()
+    )
 
-    application = builder.build()
-
+    # 🔹 Handlerlar
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("getid", get_id))
     application.add_handler(CommandHandler("admin", admin_panel))
@@ -1361,11 +1369,55 @@ def main():
     application.add_handler(CallbackQueryHandler(button_callback, pattern='^ans_|^admin_user_'))
     application.add_handler(
         MessageHandler(filters.TEXT | filters.CONTACT | filters.VOICE | filters.VIDEO | filters.VIDEO_NOTE,
-                       handle_message))
+                       handle_message)
+    )
 
-    logger.info("Bot ishga tushdi...")
+    logger.info("🚀 Bot ishga tushdi...")
     logger.info("Kanal ID ni olish uchun kanalga /getid buyrug'ini yuboring")
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
+
+    # 🔹 Render yoki boshqa servislar uchun port
+    port = int(os.environ.get("PORT", "8080"))
+    application.run_polling(allowed_updates=Update.ALL_TYPES, port=port)
+
+
+# def main():
+#     """
+#     Botni ishga tushirish
+#     """
+#     builder = Application.builder().token(BOT_TOKEN)
+#
+#     if PROXY_URL:
+#         logger.info(f"Proxy ishlatilmoqda: {PROXY_URL}")
+#
+#         proxy_auth = None
+#         if PROXY_USERNAME and PROXY_PASSWORD:
+#             proxy_auth = httpx.BasicAuth(PROXY_USERNAME, PROXY_PASSWORD)
+#
+#         httpx_client = httpx.AsyncClient(
+#             proxy=PROXY_URL,
+#             auth=proxy_auth,
+#             timeout=30.0
+#         )
+#
+#         from telegram.request import HTTPXRequest
+#         request = HTTPXRequest(http_version="1.1", client=httpx_client)
+#         builder = builder.request(request)
+#
+#     application = builder.build()
+#
+#     application.add_handler(CommandHandler("start", start))
+#     application.add_handler(CommandHandler("getid", get_id))
+#     application.add_handler(CommandHandler("admin", admin_panel))
+#     application.add_handler(CallbackQueryHandler(position_callback, pattern='^pos_'))
+#     application.add_handler(CallbackQueryHandler(admin_page_callback, pattern='^admin_page_'))
+#     application.add_handler(CallbackQueryHandler(button_callback, pattern='^ans_|^admin_user_'))
+#     application.add_handler(
+#         MessageHandler(filters.TEXT | filters.CONTACT | filters.VOICE | filters.VIDEO | filters.VIDEO_NOTE,
+#                        handle_message))
+#
+#     logger.info("Bot ishga tushdi...")
+#     logger.info("Kanal ID ni olish uchun kanalga /getid buyrug'ini yuboring")
+#     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
 if __name__ == '__main__':
