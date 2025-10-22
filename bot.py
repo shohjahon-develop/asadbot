@@ -679,7 +679,7 @@ def start(update, context):
     update.message.reply_text("Salom! Bot ishlayapti ✅")
 
 def start_bot():
-    updater = Updater(BOT_TOKEN, use_context=True)
+    updater = Updater(BOT_TOKEN)
     dp = updater.dispatcher
     dp.add_handler(CommandHandler("start", start))
     updater.start_polling()
